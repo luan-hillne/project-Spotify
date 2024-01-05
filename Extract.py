@@ -34,9 +34,9 @@ def get_token():
     return token
 
 token = get_token()
-track_name = "do"
+track_name = "tom"
 # Creating an function to be used in other pyrhon files
-def search_for_track():
+def search_for_track(track_name):
     url ="https://api.spotify.com/v1/search"
     headers = get_auth_header(token)
     query = f"?q={track_name}&type=track&limit=10"
@@ -48,46 +48,53 @@ def search_for_track():
         print("No artist with this name exist...")
         return None
     album_id  = []
-    release_date_precision =[]
-    release_date =[]
-    uri = []
-    #restriction =[]
-    #artist_id = []
+    album_name = []
+    album_release_date =[]
+
+    artist_id = []
     artist_name = []
-    #track_id =[]
-    name_track =[]
+    artist_type = [] 
+
+    track_id =[]
+    track_name =[]
     popularity_track =[]
-    artist_type = []
+    
     for song in json_res:
         album_id.append(song["album"]["id"])
-        release_date_precision.append(song["album"]["release_date_precision"])
-        release_date.append(song["album"]["release_date"])
-        uri.append(song["uri"])
-        #restriction.append(song["restrictions"][0]["reason"])
-        #artist_id.append(song["artists"]["id"])
+        album_name.append(song["album"]["name"])
+        album_release_date.append(song["album"]["release_date"])
+
+        artist_id.append(song["artists"][0]["id"])
         artist_name.append(song["artists"][0]["name"])
         artist_type.append(song["artists"][0]["type"])
-        #track_id.append(song["id"])
-        name_track.append(song["name"])
+
+        track_id.append(song["id"])
+        track_name.append(song["name"])
         popularity_track.append(song["popularity"])
 
     album_dict = {
-        "id_album":album_id,
-        "release_date_precision": release_date_precision,
-        "release_date":release_date,
-        "uri": uri,
-        # "restriction": restriction,
-        "artist_type":artist_type,
+        "album_id":album_id,
+        "album_name": album_name,
+        "album_release_date":album_release_date,
+    }
+
+    artist_dict = {
+        "artist_id":artist_id,
         "artist_name":artist_name,
-        #"track_id": track_id,
-        "name_track": name_track,
+        "artist_type":artist_type
+    }
+
+    track_dict = {
+        "track_id": track_id,
+        "track_name": track_name,
         "popularity_track": popularity_track
     }
-    album_df = pd.DataFrame(album_dict, columns=['id_album','name_track','release_date','uri','artist_type','artist_name','release_date_precision','popularity_track'])
+    album_df = pd.DataFrame(album_dict, columns=['album_id','album_name','album_release_date'])
+    artist_df = pd.DataFrame(artist_dict, columns=['artist_id','artist_name','artist_type'])
+    track_df = pd.DataFrame(track_dict, columns = ['track_id','track_name','popularity_track'])
 
-    return album_df
+    return album_df,artist_df,track_df
 
 
-
-# res = search_for_track(token,"Do")
-# print(res)
+#res = search_for_track("tom")
+#print(res)
